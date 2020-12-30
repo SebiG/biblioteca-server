@@ -12,7 +12,7 @@ public class UserService {
 
 	public UserService() {
 		try {
-			userDao = new UserDao(Persistence.createEntityManagerFactory("test-jsp"));
+			userDao = new UserDao(Persistence.createEntityManagerFactory("BibliotecaServer"));
 		} catch (Exception ex) {
 			System.out.println(ex);
 		}

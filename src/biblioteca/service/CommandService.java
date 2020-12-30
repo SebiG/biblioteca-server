@@ -11,8 +11,11 @@ import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
-//import com.google.gson.Gson;
-//import biblioteca.model.User;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import biblioteca.model.User;
+
 
 @FunctionalInterface
 interface InputDataHandlerInterface<T> {
@@ -24,14 +27,36 @@ interface InputDataHandlerInterface<T> {
 public class CommandService implements Runnable {
 	private final ServerSocket serverSocket;
 	// store one lambda for each command
-	private static final HashMap<String, InputDataHandlerInterface<String>> map = new HashMap<String, InputDataHandlerInterface<String>>() {
+	private static final HashMap<String, InputDataHandlerInterface<JsonObject>> map = new HashMap<String, InputDataHandlerInterface<JsonObject>>() {
 
 		private static final long serialVersionUID = 1L;
 
 		{
-			put("login", (user) -> {
-				System.out.println(user);
-				return "test from server";
+			put("login", (login) -> {
+				JsonObject obj = new JsonObject();
+				String name = login.get("userName").getAsString();
+				String password = login.get("password").getAsString();
+				UserService userService = new UserService();
+				User user = null;
+				try {
+					user = userService.findUser(name, password);
+				} catch (Exception e) {
+					// e.printStackTrace();
+					obj.addProperty("message", "Cant find user! Try again. (cititor sau bibliotecar)");
+					return obj.toString();
+				}
+				if(user.getRole() == 1) {
+					obj.addProperty("userRole", "user");
+					obj.addProperty("message", "User login success!");
+					return obj.toString();
+				}
+				if(user.getRole() == 0) {
+					obj.addProperty("userRole", "admin");
+					obj.addProperty("message", "Admin login success!");
+					return obj.toString();
+				}
+				obj.addProperty("message", "Fail, check userName or password!");
+				return obj.toString();
 			});
 		}
 	};
@@ -70,17 +95,24 @@ public class CommandService implements Runnable {
 				// Read the command and data from the client
 				String receivedCommand = bufferedInputReader.readLine();
 				String receivedData = bufferedInputReader.readLine();
-
-				System.out.println("Command received:  " + receivedCommand);
-				System.out.println("Data received:  " + receivedData);
-
-				String result = map.get(receivedCommand).executeTask(receivedData);
-
-				if (!result.isEmpty()) {
-					System.out.println(result);
-				} else {
-					System.out.println("Unexpected command");
+				String result;
+				try {
+					JsonObject jsonObject = new JsonParser().parse(receivedData).getAsJsonObject();
+					result = map.get(receivedCommand).executeTask(jsonObject);				
+					if (!result.isEmpty()) {
+						System.out.println(result);
+					} else {
+						System.out.println("Unexpected command");
+					}
+				} catch (Exception e){
+					System.out.println("Error: " + e.toString());
+					JsonObject obj = new JsonObject();
+					obj.addProperty("message", "Login bug, contact dev.");
+					result = obj.toString();
 				}
+				System.out.println("Command received: " + receivedCommand);
+				System.out.println("Data received: " + receivedData);
+
 				outputToClient(bufferedOutputWriter, result, true);
 
 			} catch (SocketTimeoutException ste) {

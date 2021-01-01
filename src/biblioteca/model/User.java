@@ -2,6 +2,9 @@ package biblioteca.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import com.google.gson.annotations.Expose;
+
 import java.util.List;
 
 
@@ -17,21 +20,20 @@ public class User implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Expose
 	private int userID;
 
+	@Expose
 	private int role;
 
+	@Expose
 	private String userName;
 
 	private String userPassword;
 
 	//bi-directional many-to-one association to Record
-	@OneToMany(mappedBy="user1")
-	private List<Record> records1;
-
-	//bi-directional many-to-one association to Record
-	@OneToMany(mappedBy="user2")
-	private List<Record> records2;
+	@OneToMany(mappedBy="user")
+	private List<Record> records;
 
 	//bi-directional many-to-one association to Review
 	@OneToMany(mappedBy="user")
@@ -72,48 +74,26 @@ public class User implements Serializable {
 		this.userPassword = userPassword;
 	}
 
-	public List<Record> getRecords1() {
-		return this.records1;
+	public List<Record> getRecords() {
+		return this.records;
 	}
 
-	public void setRecords1(List<Record> records1) {
-		this.records1 = records1;
+	public void setRecords(List<Record> records) {
+		this.records = records;
 	}
 
-	public Record addRecords1(Record records1) {
-		getRecords1().add(records1);
-		records1.setUser1(this);
+	public Record addRecord(Record record) {
+		getRecords().add(record);
+		record.setUser(this);
 
-		return records1;
+		return record;
 	}
 
-	public Record removeRecords1(Record records1) {
-		getRecords1().remove(records1);
-		records1.setUser1(null);
+	public Record removeRecord(Record record) {
+		getRecords().remove(record);
+		record.setUser(null);
 
-		return records1;
-	}
-
-	public List<Record> getRecords2() {
-		return this.records2;
-	}
-
-	public void setRecords2(List<Record> records2) {
-		this.records2 = records2;
-	}
-
-	public Record addRecords2(Record records2) {
-		getRecords2().add(records2);
-		records2.setUser2(this);
-
-		return records2;
-	}
-
-	public Record removeRecords2(Record records2) {
-		getRecords2().remove(records2);
-		records2.setUser2(null);
-
-		return records2;
+		return record;
 	}
 
 	public List<Review> getReviews() {

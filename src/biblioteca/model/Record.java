@@ -24,11 +24,6 @@ public class Record implements Serializable {
 
 	private int state;
 
-	//bi-directional many-to-one association to User
-	@ManyToOne
-	@JoinColumn(name="userID")
-	private User user1;
-
 	//bi-directional many-to-one association to Book
 	@ManyToOne
 	@JoinColumn(name="bookID")
@@ -37,9 +32,17 @@ public class Record implements Serializable {
 	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JoinColumn(name="bookingRequestBy")
-	private User user2;
+	private User user;
 
 	public Record() {
+	}
+
+	public Record(User user, Book book, int state) {
+		super();
+		this.state = state;
+		this.book = book;
+		this.user = user;
+		this.date = new Date();
 	}
 
 	public int getRecordID() {
@@ -66,14 +69,6 @@ public class Record implements Serializable {
 		this.state = state;
 	}
 
-	public User getUser1() {
-		return this.user1;
-	}
-
-	public void setUser1(User user1) {
-		this.user1 = user1;
-	}
-
 	public Book getBook() {
 		return this.book;
 	}
@@ -82,12 +77,12 @@ public class Record implements Serializable {
 		this.book = book;
 	}
 
-	public User getUser2() {
-		return this.user2;
+	public User getUser() {
+		return this.user;
 	}
 
-	public void setUser2(User user2) {
-		this.user2 = user2;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 }

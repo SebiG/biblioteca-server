@@ -24,14 +24,12 @@ CREATE TABLE Books (
 CREATE TABLE Records (
 	recordID INT UNSIGNED NOT NULL auto_increment,
     -- record by
-    userID SMALLINT UNSIGNED NOT NULL, 
     bookingRequestBy SMALLINT UNSIGNED NOT NULL,
     bookID INT UNSIGNED NOT NULL,
     -- 0 -returned, 1 -booking request, 2 -borrowed
-    state SMALLINT UNSIGNED NOT NULL default 1,
+    state SMALLINT UNSIGNED NOT NULL default 0,
     date DATETIME NOT NULL DEFAULT NOW(),
 	PRIMARY KEY (recordID),
-    FOREIGN KEY (userID) REFERENCES Users(userID),
     FOREIGN KEY (bookID) REFERENCES Books(bookID),
     FOREIGN KEY (bookingRequestBy) REFERENCES Users(userID)
 );
@@ -63,7 +61,7 @@ INSERT INTO Books VALUES
 (NULL, "The Odyssey", "Homer", 0);
 
 INSERT INTO Records VALUES
-(NULL, 2, 2, 1, 1, NOW());
+(NULL, 2, 1, 1, NOW());
 
 INSERT INTO Reviews VALUES
 (NULL, 2, 2, "A major achievement in 20th century literature.");

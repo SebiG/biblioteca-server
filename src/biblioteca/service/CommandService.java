@@ -11,9 +11,13 @@ import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import biblioteca.model.Book;
+import biblioteca.model.Record;
 import biblioteca.model.User;
 
 
@@ -26,6 +30,11 @@ interface InputDataHandlerInterface<T> {
 
 public class CommandService implements Runnable {
 	private final ServerSocket serverSocket;
+	private static Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+	private static BookService bookService = new BookService();
+	private static RecordService recordService = new RecordService();
+	private static UserService userService = new UserService();
+	
 	// store one lambda for each command
 	private static final HashMap<String, InputDataHandlerInterface<JsonObject>> map = new HashMap<String, InputDataHandlerInterface<JsonObject>>() {
 
@@ -36,15 +45,16 @@ public class CommandService implements Runnable {
 				JsonObject obj = new JsonObject();
 				String name = login.get("userName").getAsString();
 				String password = login.get("password").getAsString();
-				UserService userService = new UserService();
 				User user = null;
 				try {
-					user = userService.findUser(name, password);
+					user = userService.checkLogin(name, password);
 				} catch (Exception e) {
-					// e.printStackTrace();
 					obj.addProperty("message", "Cant find user! Try again. (cititor sau bibliotecar)");
 					return obj.toString();
 				}
+				
+				obj.addProperty("userName", user.getUserName());
+				obj.addProperty("userID", user.getUserID());
 				if(user.getRole() == 1) {
 					obj.addProperty("userRole", "user");
 					obj.addProperty("message", "User login success!");
@@ -56,6 +66,39 @@ public class CommandService implements Runnable {
 					return obj.toString();
 				}
 				obj.addProperty("message", "Fail, check userName or password!");
+				return obj.toString();
+			});
+			
+			put("getBooks", (request) -> {
+				String gsonList = null;
+				if(request.has("filter")) {
+					if(request.get("filter").getAsString().equals("all")) {
+						gsonList = gson.toJson(bookService.getAllBooks());
+					}
+				}
+				System.out.println(gsonList);
+				return gsonList;
+			});
+			
+			put("reserved", (request) -> {
+				JsonObject obj = new JsonObject();
+
+				try {
+					Book b = bookService.findBook(request.get("bookID").getAsString());
+					User u = userService.findUser(request.get("userID").getAsString());
+					if(b.getStock() < 1) {
+						//TODO create custom exception, inform client to update stock and try again later
+						throw new Exception("Book not in stock!");
+					}
+					b.decrementStock();
+					bookService.updateBook(b);
+					Record r = new Record(u, b, 1);
+					recordService.addRecord(r);
+					obj.addProperty("message", "ok");
+				} catch (Exception e) {
+					obj.addProperty("message", "error");
+					e.printStackTrace();
+				}
 				return obj.toString();
 			});
 		}

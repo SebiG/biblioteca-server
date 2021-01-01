@@ -31,7 +31,7 @@ public class UserService {
 	}
 
 	/// for login
-	public User findUser(String user, String pass) throws Exception {
+	public User checkLogin(String user, String pass) throws Exception {
 		List<User> users = userDao.find(user);
 		if (users.size() == 0) {
 			throw new Exception("User not found!");
@@ -41,6 +41,15 @@ public class UserService {
 		if (pass.compareTo(u.getUserPassword()) != 0) {
 			throw new Exception("Password does not match");
 		}
+		return u;
+	}
+
+	public User findUser(String userID) throws Exception {
+		List<User> users = userDao.findByID(userID);
+		if (users.size() == 0) {
+			throw new Exception("User not found!");
+		}
+		User u = users.get(0);
 		return u;
 	}
 }

@@ -80,6 +80,7 @@ public class CommandService implements Runnable {
 				return gsonList;
 			});
 			
+			//rezerva cartea (pt. user)
 			put("reserved", (request) -> {
 				JsonObject obj = new JsonObject();
 
@@ -87,7 +88,7 @@ public class CommandService implements Runnable {
 					Book b = bookService.findBook(request.get("bookID").getAsString());
 					User u = userService.findUser(request.get("userID").getAsString());
 					if(b.getStock() < 1) {
-						//TODO create custom exception, inform client to update stock and try again later
+						//TODO create custom exception, inform client to update stock and to try again later
 						throw new Exception("Book not in stock!");
 					}
 					b.decrementStock();
@@ -100,6 +101,35 @@ public class CommandService implements Runnable {
 					e.printStackTrace();
 				}
 				return obj.toString();
+			});
+			
+			put("getRecords", (request) -> {
+				String gsonList = null;
+				if(request.has("userID")) {
+					User u;
+					try {
+						u = userService.findUser(request.get("userID").getAsString());
+						gsonList = gson.toJson(u.getRecords());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				System.out.println(gsonList);
+				return gsonList;
+			});
+			
+			put("getRecord", (request) -> {
+				String json = null;
+				if(request.has("recordID")) {
+					Record r;
+					try {
+						r = recordService.findRecord(request.get("recordID").getAsString());
+						json = gson.toJson(r);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				return json;
 			});
 		}
 	};

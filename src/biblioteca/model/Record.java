@@ -2,6 +2,9 @@ package biblioteca.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import com.google.gson.annotations.Expose;
+
 import java.util.Date;
 
 
@@ -17,21 +20,26 @@ public class Record implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Expose
 	private int recordID;
 
 	@Temporal(TemporalType.TIMESTAMP)
+	@Expose
 	private Date date;
 
+	@Expose
 	private int state;
 
 	//bi-directional many-to-one association to Book
 	@ManyToOne
 	@JoinColumn(name="bookID")
+	@Expose
 	private Book book;
 
 	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JoinColumn(name="bookingRequestBy")
+	@Expose
 	private User user;
 
 	public Record() {

@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -42,6 +43,7 @@ public class CommandService implements Runnable {
 
 		{
 			put("login", (login) -> {
+				//dummy login
 				JsonObject obj = new JsonObject();
 				String name = login.get("userName").getAsString();
 				String password = login.get("password").getAsString();
@@ -106,12 +108,17 @@ public class CommandService implements Runnable {
 			put("getRecords", (request) -> {
 				String gsonList = null;
 				if(request.has("userID")) {
-					User u;
-					try {
-						u = userService.findUser(request.get("userID").getAsString());
-						gsonList = gson.toJson(u.getRecords());
-					} catch (Exception e) {
-						e.printStackTrace();
+					if(request.get("userID").getAsString().equals("All")) {
+						List<Record> rl = recordService.getAllRecords();
+						gsonList = gson.toJson(rl);
+					} else {
+						User u;
+						try {
+							u = userService.findUser(request.get("userID").getAsString());
+							gsonList = gson.toJson(u.getRecords());
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				}
 				System.out.println(gsonList);

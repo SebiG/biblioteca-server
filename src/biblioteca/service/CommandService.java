@@ -138,6 +138,24 @@ public class CommandService implements Runnable {
 				}
 				return json;
 			});
+			
+			put("setStateForRecord", (request) -> {
+				JsonObject obj = new JsonObject();
+				if(request.has("recordID")) {
+					try {
+						recordService.updateRecordState(
+							request.get("recordID").getAsString(), 
+							request.get("state").getAsInt()
+						);
+						obj.addProperty("message", "ok");
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+						obj.addProperty("message", "error");
+					}
+				}
+				return obj.toString();
+			});
 		}
 	};
 
@@ -179,7 +197,7 @@ public class CommandService implements Runnable {
 				try {
 					JsonObject jsonObject = new JsonParser().parse(receivedData).getAsJsonObject();
 					result = map.get(receivedCommand).executeTask(jsonObject);				
-					if (!result.isEmpty()) {
+					if (result != null && !result.isEmpty()) {
 						System.out.println(result);
 					} else {
 						System.out.println("Unexpected command");

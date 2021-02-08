@@ -28,6 +28,12 @@ public class RecordService {
 		recordDao.update(updateRecord);
 	}
 
+	public void updateRecordState(String recordID, Integer state) throws Exception {
+		Record r = this.findRecord(recordID);
+		r.setState(state);
+		recordDao.update(r);
+	}
+	
 	public List<Record> getAllRecords() {
 		return recordDao.findAll();
 	}

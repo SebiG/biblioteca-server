@@ -139,6 +139,22 @@ public class CommandService implements Runnable {
 				return json;
 			});
 			
+			put("putBook", (request) -> {
+				Book book = new Book();
+				book.setTitle(request.get("title").getAsString());
+				book.setAuthor(request.get("authors").getAsString());
+				book.setStock(request.get("stock").getAsInt());
+				if(request.has("title")) {
+					try {
+						bookService.addBook(book);
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				return gson.toJson(List.of(book));
+			});
+			
 			put("setStateForRecord", (request) -> {
 				JsonObject obj = new JsonObject();
 				if(request.has("recordID")) {

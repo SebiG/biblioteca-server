@@ -32,15 +32,6 @@ public class BookService {
 		return bookDao.findAll();
 	}
 
-	public Book findRecord(String recordID) throws Exception {
-		List<Book> records = bookDao.find(recordID);
-		if (records.size() == 0) {
-			throw new Exception("Book not found!");
-		}
-		Book u = records.get(0);
-		return u;
-	}
-
 	public Book findBook(String bookID) throws Exception {
 		List<Book> books = bookDao.find(bookID);
 		if (books.size() == 0) {

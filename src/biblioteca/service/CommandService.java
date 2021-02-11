@@ -19,6 +19,7 @@ import com.google.gson.JsonParser;
 
 import biblioteca.model.Book;
 import biblioteca.model.Record;
+import biblioteca.model.Review;
 import biblioteca.model.User;
 
 
@@ -171,6 +172,23 @@ public class CommandService implements Runnable {
 					}
 				}
 				return obj.toString();
+			});
+			
+			put("getReviewsForBook", (request) -> {
+				String gsonList = null;
+				Book book = null;
+				if(request.has("bookID")) {
+					try {
+						book = bookService.findBook(request.get("bookID").getAsString());
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					List<Review> reviews = book.getReviews();
+					gsonList = gson.toJson(reviews);
+				}
+				System.out.println(gsonList);
+				return gsonList;
 			});
 		}
 	};

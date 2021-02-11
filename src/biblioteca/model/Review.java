@@ -3,6 +3,8 @@ package biblioteca.model;
 import java.io.Serializable;
 import javax.persistence.*;
 
+import com.google.gson.annotations.Expose;
+
 
 /**
  * The persistent class for the reviews database table.
@@ -16,19 +18,23 @@ public class Review implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Expose
 	private int reviewID;
 
 	@Lob
+	@Expose
 	private String review;
 
 	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JoinColumn(name="userID")
+	@Expose
 	private User user;
 
 	//bi-directional many-to-one association to Book
 	@ManyToOne
 	@JoinColumn(name="bookID")
+	@Expose
 	private Book book;
 
 	public Review() {

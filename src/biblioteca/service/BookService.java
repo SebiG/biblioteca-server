@@ -24,10 +24,6 @@ public class BookService {
 		bookDao.update(updatedBook);
 	}
 	
-	public void reserve(Book updatedBook) {
-		bookDao.update(updatedBook);
-	}
-
 	public List<Book> getAllBooks() {
 		return bookDao.findAll();
 	}

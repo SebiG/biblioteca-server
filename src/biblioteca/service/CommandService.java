@@ -190,6 +190,34 @@ public class CommandService implements Runnable {
 				System.out.println(gsonList);
 				return gsonList;
 			});
+			
+			put("putReviewForBook", (request) -> {
+				Review review = new Review();
+				if(request.has("bookID")) {
+					String userID = request.get("userID").getAsString();
+					String bookID = request.get("bookID").getAsString();
+					User u;
+					try {
+						u = userService.findUser(userID);
+						review.setUser(u);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					Book b;
+					try {
+						b = bookService.findBook(bookID);
+						review.setBook(b);
+						review.setReview(request.get("review").getAsString());
+						b.addReview(review);
+						bookService.updateBook(b);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				return gson.toJson(List.of(review));
+			});
 		}
 	};
 
@@ -239,7 +267,7 @@ public class CommandService implements Runnable {
 				} catch (Exception e){
 					System.out.println("Error: " + e.toString());
 					JsonObject obj = new JsonObject();
-					obj.addProperty("message", "Login bug, contact dev.");
+					obj.addProperty("message", "Login bug, contact dev."); //TODO: generalize message
 					result = obj.toString();
 				}
 				System.out.println("Command received: " + receivedCommand);
